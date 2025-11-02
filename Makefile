@@ -1,9 +1,14 @@
 CXX = g++
-CXXFLAGS = -Wall -g
+CXXFLAGS = -Wall -Wextra -std=c++17
 TARGET = program
-all: $(basic_calculator)
-	./$(TARGET)
-$(TARGET): basic_calculator.cpp
-	$(CXX) $(CXXFLAGS) -o $(TARGET) basic_calculator.cpp
+SRCS = main.cpp
+OBJS = $(SRCS:.cpp=.o)
+all: $(TARGET)
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 clean:
-	rm -f $(TARGET)
+	rm -f $(OBJS) $(TARGET)
+run: all
+	./$(TARGET)
