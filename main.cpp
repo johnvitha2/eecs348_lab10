@@ -59,33 +59,36 @@ array<string, 60> read_file(ifstream &file){
 * Return true if str is a valid double number, else return false
 */
 bool is_valid_double(string str){
-    for (size_t i = 0; i < str.length(); i++){
-        if(!is_digit(str[i])){
-            if(str[i] == '.'){
-                if(i+1 == str.length()){
+    for (size_t i = 0; i < str.length(); i++){ // Loop through each char in the string
+        if(!is_digit(str[i])){ // If not a digit
+            if(str[i] == '.'){ // If it is decimal point
+                if(i+1 == str.length()){ // String cannot end with a decimal point
                     return false;
-                } else if(!is_digit(str[i+1])){
+                } else if(!is_digit(str[i+1])){ // Char after decimal point must be a digit
                     return false;
                 }
-            } else if(str[i] == '+' || str[i] == '-'){
-                if(i+1 == str.length()){
+            } else if(str[i] == '+' || str[i] == '-'){ // If it is a +/- sign
+                if(i+1 == str.length()){ // String cannot end with a sign
                     return false;
-                } else if(!is_digit(str[i+1])){
+                } else if(!is_digit(str[i+1])){ // Char after sign must be a digit
                     return false;
                 }
             } else {
-                return false;
+                return false; // Return false if char is not a digit, '.', or '(+/-)'
             }
         }
     }
-    return true;
+    return true; // Double is valid
 }
 
-double make_double(string double_string){ // Input: 0001.0, place=4. decimal_place=1, 
+/*
+* Take a string representing a double as a parameter and return a copy of type double
+*/
+double double_copy(string double_string){ 
     double new_double = 0; // New double to return
     double sign = 1; // Sign of double, assume positive
     int place = 0; // Counter for place before the decimal
-    int decimal_place; // Counter for decimal place
+    int decimal_place = 0; // Counter for decimal place
     double place_multiplier = 1.0; 
     bool has_decimal = false;
 
@@ -96,36 +99,35 @@ double make_double(string double_string){ // Input: 0001.0, place=4. decimal_pla
         double_string.erase(0, 1); // Erase the sign to make the string easier to read
     }
 
-    while(size_t(place) != double_string.length() && double_string[place] != '.'){ // Repeat until the end of the string or a decimal point
-        place++; // Increment place up 1
-    }
-
-    for(size_t i = 0; i < double_string.length(); i ++){
-        if(double_string[i] == '.'){
-            has_decimal = true;
+    for(size_t i = 0; i < double_string.length(); i ++){ // Loop through each 
+        if(double_string[i] == '.'){ // If decimal is reached
+            has_decimal = true; 
+        }
+        if(!has_decimal){ // If decimal not reached yet/there is no decimal
+            place++; // Increment place up 1
         }
     }
-    if(has_decimal){
+    if(has_decimal){ // If double has a decimal
         decimal_place = double_string.length() - (place+1); // Calculate the decimal place
     }
     
 
-    for(int i = 1; i < place; i++){
-        place_multiplier *= 10.0;
+    for(int i = 1; i < place; i++){ 
+        place_multiplier *= 10.0; // Calculate the place of the first digit in the double
     }
     for(size_t i = 0; i < double_string.length(); i++){ // Loop through each character in the string
         if(double_string[i] != '.'){ // If not at the decimal point
             if(place != 0){ // If there are still numbers before the decimal point
                 new_double += place_multiplier*get_digit(double_string[i]); // Add the value of the digit at i to the new double
                 place--; // Increment place down 1
-                place_multiplier /= 10.0; 
-            } else if(decimal_place != 0){ // If at the decimal place
+                place_multiplier /= 10.0; // Update the place multiplier
+            } else if(decimal_place != 0){ // If there is a decimal place
                 new_double += get_digit(double_string[i])/place_multiplier; // Add the value of the digit at i to the new double
                 decimal_place--; // Increment decimal place down 1
-                place_multiplier *= 10.0; 
+                place_multiplier *= 10.0; // Update the place multiplier
             } 
         }  else {
-            place_multiplier = 10.0;
+            place_multiplier = 10.0; // Reset the place multiplier for decimal places
         }
     }
     return new_double*sign; // Return the new double
@@ -135,7 +137,7 @@ double make_double(string double_string){ // Input: 0001.0, place=4. decimal_pla
 * Return the sum of two doubles in string format using make_double(string double_string)
 */
 double sum(string addend1, string addend2){
-    return make_double(addend1) + make_double(addend2); // Return the sum
+    return double_copy(addend1) + double_copy(addend2); // Return the sum
 }
 
 int main(){
